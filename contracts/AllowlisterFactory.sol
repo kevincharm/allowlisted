@@ -18,12 +18,14 @@ contract AllowlisterFactory is Ownable {
 
     function createRaffle(
         string calldata projectLensHandle,
+        string calldata raffleDisplayName,
         uint256 winnersToDraw,
         address winnersModule,
         address validateModule
     ) external returns (address, uint256) {
         uint256 raffleId = s_raffleId++;
         Allowlister raffle = new Allowlister(
+            raffleDisplayName,
             lensHub,
             projectLensHandle,
             winnersToDraw,

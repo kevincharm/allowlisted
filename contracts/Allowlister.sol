@@ -17,6 +17,9 @@ import {IWinnersModule} from "./IWinnersModule.sol";
  *      n random winners for the allowlist.
  */
 contract Allowlister is IRandomiserCallback, Ownable {
+    /// @notice The display name of the raffle
+    string public displayName;
+
     /// @notice The LensHub contract
     ILensHub public immutable lensHub;
 
@@ -59,6 +62,7 @@ contract Allowlister is IRandomiserCallback, Ownable {
     event RaffleDrawn(uint256 indexed profileId);
 
     constructor(
+        string memory displayName_,
         address lensHub_,
         string memory projectLensHandle,
         uint256 winnersToDraw_,
@@ -66,6 +70,7 @@ contract Allowlister is IRandomiserCallback, Ownable {
         address winnersModule_,
         address validateModule_
     ) Ownable() {
+        displayName = displayName_;
         lensHub = ILensHub(lensHub_);
         raffleProfileId = lensHub.getProfileIdByHandle(projectLensHandle);
         winnersToDraw = winnersToDraw_;

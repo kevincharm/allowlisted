@@ -5,16 +5,20 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {Allowlister} from "./Allowlister.sol";
 
 contract AllowlisterFactory is Ownable {
+    address public immutable lensHub;
+    address public immutable randomiser;
+
     uint256 public s_raffleId = 0;
     mapping(uint256 => Allowlister) public raffles;
 
-    constructor() Ownable() {}
+    constructor(address lensHub_, address randomiser_) Ownable() {
+        lensHub = lensHub_;
+        randomiser = randomiser_;
+    }
 
     function deploy(
-        address lensHub,
         string calldata projectLensHandle,
         uint256 winnersToDraw,
-        address randomiser,
         address winnersModule,
         address validateModule
     ) external returns (address, uint256) {

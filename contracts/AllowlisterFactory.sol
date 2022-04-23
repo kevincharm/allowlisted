@@ -16,7 +16,7 @@ contract AllowlisterFactory is Ownable {
         randomiser = randomiser_;
     }
 
-    function deploy(
+    function createRaffle(
         string calldata projectLensHandle,
         uint256 winnersToDraw,
         address winnersModule,

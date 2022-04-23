@@ -25,6 +25,13 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
 const config: HardhatUserConfig = {
   solidity: "0.8.10",
   networks: {
+    hardhat: {
+      forking: {
+        enabled: true,
+        url: "https://matic-testnet-archive-rpc.bwarelabs.com",
+        blockNumber: 26054737,
+      },
+    },
     mumbai: {
       url: "https://matic-testnet-archive-rpc.bwarelabs.com",
       accounts:

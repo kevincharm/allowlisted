@@ -10,7 +10,7 @@ contract AllowedlistNFT is ERC721, Ownable, IWinnersModule {
     }
 
     function mintWhitelistToken(address winner) external onlyOwner {
-        _safeMint(winners);
+        _safeMint(winner);
         return true;
     }
 

@@ -1,19 +1,16 @@
 import { expect } from "chai";
 import { ethers } from "hardhat";
+import { Allowlister__factory, ILensHub__factory } from "../typechain";
 
-describe("Greeter", function () {
-  it("Should return the new greeting once it's changed", async function () {
-    const Greeter = await ethers.getContractFactory("Greeter");
-    const greeter = await Greeter.deploy("Hello, world!");
-    await greeter.deployed();
+describe("Allowlister", () => {
+  it("should emit 'RaffleDrawn' on raffle()", async function() {
+    const [owner] = await ethers.getSigners();
+    const lensHub = ILensHub__factory.connect("0x4BF0c7AD32Fd2d32089790a54485e23f5C7736C0", owner);
+    const Allowlister = await new Allowlister__factory(owner)
+      .deploy(lensHub.address, "alice", 2, owner.address, ethers.constants.AddressZero, ethers.constants.AddressZero);
+    await Allowlister.deployed();
 
-    expect(await greeter.greet()).to.equal("Hello, world!");
-
-    const setGreetingTx = await greeter.setGreeting("Hola, mundo!");
-
-    // wait until the transaction is mined
-    await setGreetingTx.wait();
-
-    expect(await greeter.greet()).to.equal("Hola, mundo!");
+    await Allowlister.receiveRandomness(3);
+    await expect(Allowlister.raffle()).to.emit(Allowlister, "RaffleDrawn");
   });
 });

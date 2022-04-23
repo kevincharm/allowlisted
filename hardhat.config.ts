@@ -28,7 +28,7 @@ const config: HardhatUserConfig = {
     hardhat: {
       forking: {
         enabled: true,
-        url: "https://matic-testnet-archive-rpc.bwarelabs.com",
+        url: "https://polygon-mumbai.g.alchemy.com/v2/b5XdcU7Wm5EWKN9FO4wrDVFa5KG_yYEH",
         blockNumber: 26054737,
       },
     },

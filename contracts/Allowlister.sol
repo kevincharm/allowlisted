@@ -59,19 +59,19 @@ contract Allowlister is IRandomiserCallback, Ownable {
     event RaffleDrawn(uint256 indexed profileId);
 
     constructor(
-        ILensHub lensHub_,
+        address lensHub_,
         string memory projectLensHandle,
         uint256 winnersToDraw_,
-        Randomiser randomiser_,
-        IWinnersModule winnersModule_,
-        IValidateModule validateModule_
+        address randomiser_,
+        address winnersModule_,
+        address validateModule_
     ) Ownable() {
-        lensHub = lensHub_;
+        lensHub = ILensHub(lensHub_);
         raffleProfileId = lensHub.getProfileIdByHandle(projectLensHandle);
         winnersToDraw = winnersToDraw_;
-        randomiser = randomiser_;
-        winnersModule = winnersModule_;
-        validateModule = validateModule_;
+        randomiser = Randomiser(randomiser_);
+        winnersModule = IWinnersModule(winnersModule_);
+        validateModule = IValidateModule(validateModule_);
     }
 
     /**
@@ -107,7 +107,7 @@ contract Allowlister is IRandomiserCallback, Ownable {
             if (hasWinnersModule) {
                 address winner = s_registeredAddresses[drawnProfileId];
                 require(winner != address(0), "Mint to zero address");
-                winnersModule.mintWhitelistToken(winner);
+                winnersModule.award(winner);
             }
 
             // Remove ID from possible domain of IDs, so they can't be drawn again
@@ -139,7 +139,7 @@ contract Allowlister is IRandomiserCallback, Ownable {
         // This is where the validation module would check for this profile's
         // follower count, publication count, or timestamp of follow.
         require(
-            validateModule.validateFollower(profileId),
+            validateModule.validate(profileId),
             "Profile validation failed"
         );
         s_registeredIds.push(profileId);

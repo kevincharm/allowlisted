@@ -23,7 +23,15 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
 // Go to https://hardhat.org/config/ to learn more
 
 const config: HardhatUserConfig = {
-  solidity: "0.8.10",
+  solidity: {
+    version: "0.8.10",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 1000,
+      },
+    },
+  },
   networks: {
     hardhat: {
       forking: {
@@ -33,9 +41,9 @@ const config: HardhatUserConfig = {
       },
     },
     mumbai: {
-      url: "https://matic-testnet-archive-rpc.bwarelabs.com",
-      accounts:
-        process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+      url: "https://polygon-mumbai.g.alchemy.com/v2/b5XdcU7Wm5EWKN9FO4wrDVFa5KG_yYEH",
+      chainId: 80001,
+      accounts: [process.env.MAINNET_PK as string],
     },
   },
   gasReporter: {

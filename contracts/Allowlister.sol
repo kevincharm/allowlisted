@@ -52,6 +52,9 @@ contract Allowlister is IRandomiserCallback, Ownable {
     /// @dev Determines whether address has already registered for raffle
     mapping(address => bool) public s_addressRegistered;
 
+    /// @notice The drawn winners
+    address[] public s_winners;
+
     /// @dev The current random number (changes every time a random number is requested)
     uint256 public s_randomState;
 
@@ -106,11 +109,12 @@ contract Allowlister is IRandomiserCallback, Ownable {
             uint256 drawnProfileId = s_registeredIds[randomIndex];
 
             winnerProfileIds[winnerCount++] = drawnProfileId;
+            address winner = s_registeredAddresses[drawnProfileId];
+            s_winners.push(winner);
             emit RaffleDrawn(drawnProfileId);
 
             // Invoke winners module side-effects
             if (hasWinnersModule) {
-                address winner = s_registeredAddresses[drawnProfileId];
                 require(winner != address(0), "Mint to zero address");
                 winnersModule.award(winner);
             }

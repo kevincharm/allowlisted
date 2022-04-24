@@ -34,7 +34,6 @@ contract AllowlisterFactory is Ownable {
             validateModule
         );
         raffles[raffleId] = raffle;
-        s_raffleId = raffleId;
         return (address(raffle), raffleId);
     }
 }

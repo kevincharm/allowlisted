@@ -292,7 +292,7 @@ export default function Example() {
                           {(raffleReady && isCreating) &&
 
 
-                          <button type="button" disabled className="bg-indigo-500 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                          <button type="button" disabled className="bg-indigo-500 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-lime-400 bg-opacity-20 text-lime-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
 
                             <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
                                  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

@@ -22,10 +22,7 @@ export default function Example() {
               <span className="block xl:inline">Fairy mint</span>{' '}
               <span className="block text-lime-600 xl:inline">the fair allow list</span>
             </h1>
-            <p className="mt-3 max-w-md mx-auto text-lg text-gray-500 sm:text-xl md:mt-5 md:max-w-3xl">
-              Anim aute id magna aliqua ad ad non deserunt sunt. Qui irure qui lorem cupidatat commodo. Elit sunt amet
-              fugiat veniam occaecat fugiat aliqua.
-            </p>
+
             <div className="mt-10 sm:flex sm:justify-center lg:justify-start">
               <div className="rounded-md shadow">
                 <a

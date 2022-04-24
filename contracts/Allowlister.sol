@@ -87,20 +87,15 @@ contract Allowlister is IRandomiserCallback, Ownable {
      */
     function raffle() external onlyOwner {
         require(!s_isRaffleFinished, "Raffle already finished");
-        DataTypes.ProfileStruct memory profile = lensHub.getProfile(
-            raffleProfileId
+        // Load array of registered profile IDs into mem.
+        uint256[] memory registeredIds = s_registeredIds;
+        require(
+            registeredIds.length >= winnersToDraw,
+            "Not enough registered for raffle"
         );
-        IERC721Enumerable erc721FollowNFT = IERC721Enumerable(
-            profile.followNFT
-        );
-        uint256 totalSupply = erc721FollowNFT.totalSupply();
-        require(totalSupply >= winnersToDraw, "Not enough supply for raffle");
 
         uint256[] memory winnerProfileIds = new uint256[](winnersToDraw);
         uint256 winnerCount = 0;
-
-        // Load array of registered profile IDs into mem.
-        uint256[] memory registeredIds = s_registeredIds;
 
         bool hasWinnersModule = address(winnersModule) != address(0);
 

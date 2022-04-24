@@ -24,13 +24,10 @@ export default function Example() {
     const address = router.query.address
     if(!address || !signerOrProvider) return;
     const contract = new ethers.Contract(address as string, Allowlister.abi, signerOrProvider);
-    (async () => {
-      await contract.deployed()
-      const displayName = await contract.displayName()
-      setRaffleName(displayName)
-    })()
-    // contract.winnersToDraw().then((x) => setWinnersToDraw(x.toNumber()));
-  }, [router.query.address])
+    contract.displayName().then((x) => setRaffleName(x));
+    contract.winnersToDraw().then((x) => setWinnersToDraw(x.toNumber()));
+    contract.s_addressRegistered(account).then((x) => setRegistered(x));
+  }, [router.query.address, signerOrProvider])
 
   const handleSubmit = useCallback(async (event) => {
     event.preventDefault();
@@ -42,8 +39,8 @@ export default function Example() {
     try {
       const contract = new ethers.Contract(address as string, Allowlister.abi, signerOrProvider);
       console.log(contract);
-      await contract.connect(signerOrProvider).register();
-      // await contract.register();
+      const result = await contract.connect(signerOrProvider).register();
+      await result.wait();
       setIsOpen(true);
     } catch (e) {
       console.log(e);
@@ -92,7 +89,7 @@ export default function Example() {
 
                           <button
                             type="submit"
-                            className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                            className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-lime-400 bg-opacity-20 text-lime-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                           >
                             Register for raffle
                           </button>

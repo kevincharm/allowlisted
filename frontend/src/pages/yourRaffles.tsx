@@ -1,28 +1,57 @@
 /* This example requires Tailwind CSS v2.0+ */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import ConnectorModal from "@components/ConnectorModal";
 import { useWeb3React } from "@web3-react/core";
 import { Header } from "@components/Header";
+import { ethers } from "ethers";
+import AllowlisterFactory from "@abi/AllowlisterFactory.json";
+import Allowlister from "@abi/Allowlister.json";
+import { useRouter } from "next/router";
+import { useSignerOrProvider } from "@hooks/useWeb3React";
+import { FACTORY_CONTRACT } from "@utils/Utils";
 
 
 export default function Example() {
   const { isActive, account } = useWeb3React()
   const [isOpen, setIsOpen] = useState(false)
+  const router = useRouter();
+  const signerOrProvider = useSignerOrProvider();
+  const image = 'https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80';
 
-  const people = [
+  const [raffles, setRaffles] = useState([
     {
       name: 'Moonbirds',
-      image:
-        'https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
+      image: image,
+      address: "a"
     },
     {
       name: 'Raffle 2',
-      image:
-        'https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
+      image: image,
+      address: "b"
     }
+  ]);
 
-  ]
+  useEffect(() => {
+    if(!signerOrProvider) return;
+    const contract = new ethers.Contract(FACTORY_CONTRACT, AllowlisterFactory.abi, signerOrProvider);
+    let raffles = [];
+    contract.s_raffleId().then((maxId) => {
+      for (let i = 0; i < maxId; i++) {
+        contract.raffles(i).then((allowLister) => {
+          console.log(`AllowLister`, allowLister);
+          const currentContract = new ethers.Contract(allowLister, Allowlister.abi, signerOrProvider);
+          currentContract.displayName().then((name) => {
+            console.log(`Got ${name}`)
+            raffles.push({name, image, address: allowLister})
+            setRaffles(raffles);
+          });
+        })
+      }
+    });
+
+  }, [signerOrProvider])
+
 
 
   return (
@@ -60,7 +89,7 @@ export default function Example() {
                       </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-200 bg-white">
-                      {people.map((person) => (
+                      {raffles.map((person) => (
                         <tr key={person.name}>
                           <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
                             <div className="flex items-center">
@@ -79,7 +108,10 @@ export default function Example() {
                         </span>
                           </td>
                           <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                            <a href={"raffle/" + person.name} className="text-indigo-600 hover:text-indigo-900">
+                            <a href={"raffle/" + person.address} className="text-indigo-600 hover:text-indigo-900">
+                              View<span className="sr-only">, {person.name}</span>
+                            </a>
+                            <a href={"raffleOverview/" + person.address} className="text-indigo-600 hover:text-indigo-900">
                               Edit<span className="sr-only">, {person.name}</span>
                             </a>
                           </td>

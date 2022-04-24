@@ -3,17 +3,27 @@ pragma solidity 0.8.10;
 
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {Allowlister} from "./Allowlister.sol";
+import {Randomiser} from "./Randomiser.sol";
 
 contract AllowlisterFactory is Ownable {
     address public immutable lensHub;
-    address public immutable randomiser;
+    Randomiser public immutable randomiser;
 
     uint256 public s_raffleId = 0;
     mapping(uint256 => Allowlister) public raffles;
 
-    constructor(address lensHub_, address randomiser_) Ownable() {
+    constructor(
+        address lensHub_,
+        address coordinator_,
+        bytes32 keyHash_,
+        address linkTokenAddress_
+    ) Ownable() {
         lensHub = lensHub_;
-        randomiser = randomiser_;
+        randomiser = new Randomiser(coordinator_, keyHash_, linkTokenAddress_);
+    }
+
+    function transferRandomiserOwnership(address to) external onlyOwner {
+        randomiser.transferOwnership(to);
     }
 
     function createRaffle(
@@ -29,11 +39,12 @@ contract AllowlisterFactory is Ownable {
             lensHub,
             projectLensHandle,
             winnersToDraw,
-            randomiser,
+            address(randomiser),
             winnersModule,
             validateModule
         );
         raffles[raffleId] = raffle;
+        randomiser.authorise(address(raffle));
         return (address(raffle), raffleId);
     }
 }

@@ -157,6 +157,14 @@ contract Allowlister is IRandomiserCallback, Ownable {
         s_registeredAddresses[profileId] = msg.sender;
     }
 
+    function getRegisteredIdsLength() external view returns (uint256) {
+        return s_registeredIds.length;
+    }
+
+    function getWinnersLength() external view returns (uint256) {
+        return s_winners.length;
+    }
+
     /**
      * @notice Get the next random number using current seed.
      */

@@ -123,7 +123,6 @@ export default function Example() {
                 <div className="md:grid md:gap-6">
 
                   <div className="mt-5 md:mt-0 md:col-span-2">
-                    <form onSubmit={handleSubmit}>
                       <div className="shadow overflow-hidden sm:rounded-md">
                         <div className="px-4 py-5 bg-white sm:p-6">
                           <div className="grid grid-cols-6 gap-6">
@@ -257,13 +256,14 @@ export default function Example() {
 
                         <div className="px-4 py-3 bg-gray-50 text-center sm:px-6">
                           {!raffleReady &&
-
+                          <form onSubmit={handleRandomState}>
                           <button
                             type="submit"
                             className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-lime-400 bg-opacity-20 text-lime-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                           >
                             Roll dice!
                           </button>
+                          </form>
                           }
                           {(!raffleReady && isCreating) &&
 
@@ -280,12 +280,14 @@ export default function Example() {
                           }
                           {(raffleReady && !isCreating) &&
 
+                          <form onSubmit={handleSubmit}>
                           <button
                             type="submit"
                             className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-lime-400 bg-opacity-20 text-lime-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                           >
                             Start raffle
                           </button>
+                          </form>
                           }
                           {(raffleReady && isCreating) &&
 
@@ -302,7 +304,7 @@ export default function Example() {
                           }
                         </div>
                       </div>
-                    </form>
+
                   </div>
                 </div>
               </div>

@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.10;
 
-import {IFollowNFT} from "lens-protocol/contracts/interfaces/IFollowNFT.sol";
 import {ILensHub} from "lens-protocol/contracts/interfaces/ILensHub.sol";
 import {DataTypes} from "lens-protocol/contracts/libraries/DataTypes.sol";
 import {IERC721Enumerable} from "@openzeppelin/contracts/token/ERC721/extensions/IERC721Enumerable.sol";

@@ -4,7 +4,7 @@ import LensHub from "@abi/LensHub.json";
 import AllowlisterFactory from "@abi/AllowlisterFactory.json";
 import { useWeb3React } from "@web3-react/core";
 
-
+export const FACTORY_CONTRACT = "0x6e8D4632E9ED7dA7B4AF1d932e414d2Da336D957";
 
 export async function getHandle(): Promise<string> {
   const signerOrProvider = useSignerOrProvider();

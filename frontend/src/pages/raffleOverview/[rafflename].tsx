@@ -1,5 +1,5 @@
 /* This example requires Tailwind CSS v2.0+ */
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useCallback, useEffect, useState } from "react";
 import { useWeb3React } from "@web3-react/core";
 import { Header } from "@components/Header";
 import { Dialog, Transition } from "@headlessui/react";
@@ -13,8 +13,6 @@ import LensHub from "@abi/LensHub.json";
 export default function Example() {
   const { isActive, account } = useWeb3React()
   const router = useRouter();
-  const { raffleAddress } = router.query
-  console.log(raffleAddress);
   const [isOpen, setIsOpen] = useState(false);
   const [isCreating, setCreating] = useState(false);
   const signerOrProvider = useSignerOrProvider();
@@ -29,44 +27,59 @@ export default function Example() {
     },
     {
       handle: '@alice',
-      address: '0x7f268357a8c2552623316e2562d90e642bb538e5',
+      address: '0x7f268357a8c2552623316e2562d90e642bb538e4',
       image: image,
     },
   ]);
 
-  const lensHub = new ethers.Contract(	"0x4BF0c7AD32Fd2d32089790a54485e23f5C7736C0", LensHub.abi, signerOrProvider);
+
   const onClose = () => setIsOpen(false);
 
-  try {
-    const contract = new ethers.Contract(raffleAddress as string, Allowlister.abi, signerOrProvider);
+  useEffect(() => {
+    const address = router.query.rafflename
+    if (!address || !signerOrProvider) {
+      console.log(router.query);
+      return;
+    }
+    console.log(`Got address ${address}!`);
+    const contract = new ethers.Contract(address as string, Allowlister.abi, signerOrProvider);
+    contract.displayName().then((x) => setRaffleName(x));
+    contract.winnersToDraw().then((x) => setWinnersToDraw(x.toNumber()));
+    const lensHub = new ethers.Contract(	"0x4BF0c7AD32Fd2d32089790a54485e23f5C7736C0", LensHub.abi, signerOrProvider);
     console.log(contract);
-    setRaffleName(contract.displayName());
-    setWinnersToDraw(contract.winnersToDraw());
-    const ids = contract.s_registeredIds();
-    ids.map((x) => lensHub.getHandle(x)).then((handles: string[]) => {
-      const users = handles.map((handle, ix) => {
-        return {handle, address: ids[ix], image: image}
-      });
-      setRegisteredUsers(users);
+    let users = [];
+    contract.getRegisteredIdsLength().then((l) => {
+      for (let i = 0; i < l; i++) {
+        contract.s_registeredIds(i).then((id) => {
+          contract.s_registeredAddresses(id).then((address) => {
+            lensHub.getHandle(id).then((handle: string) => {
+              users.push({handle, address: address, image: image});
+              setRegisteredUsers(users);
+            });
+          })
+        })
+      }
     });
-  } catch (e) {
-    console.log(e);
-  }
+  }, [router.query.rafflename, signerOrProvider])
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = useCallback(async (event) => {
     console.log(`Handling!`);
     event.preventDefault();
+    const address = router.query.address
+    if (!address || !signerOrProvider) {
+      return
+    }
     setCreating(true);
     try {
-      const contract = new ethers.Contract(raffleAddress as string, Allowlister.abi, signerOrProvider);
-      await contract.raffle();
+      const contract = new ethers.Contract(address as string, Allowlister.abi, signerOrProvider);
+      await contract.connect(signerOrProvider).raffle();
       setIsOpen(true);
     } catch (e) {
       console.log(e);
     } finally {
       setCreating(false);
     }
-  }
+  }, [router.query.address, signerOrProvider]);
 
   return (
     <div>
@@ -219,7 +232,7 @@ export default function Example() {
 
                           <button
                             type="submit"
-                            className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                            className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-lime-400 bg-opacity-20 text-lime-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                           >
                             Start raffle
                           </button>

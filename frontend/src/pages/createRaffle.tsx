@@ -3,7 +3,7 @@ import React, { Fragment, useLayoutEffect, useState } from "react";
 import { useWeb3React } from "@web3-react/core";
 import { Header } from "@components/Header";
 import { Dialog, Transition } from "@headlessui/react";
-import { createRaffle, getHandle } from "@utils/Utils";
+import { createRaffle, FACTORY_CONTRACT, getHandle } from "@utils/Utils";
 import { useSignerOrProvider } from "@hooks/useWeb3React";
 import { BigNumber, ethers } from "ethers";
 import AllowlisterFactory from "@abi/AllowlisterFactory.json";
@@ -30,7 +30,7 @@ export default function Example() {
     event.preventDefault();
     setCreating(true);
     try {
-      const contract = new ethers.Contract(	"0xbBe9288504CC8c2E8776a01bAfb9dd8813E8f202", AllowlisterFactory.abi, signerOrProvider);
+      const contract = new ethers.Contract(	FACTORY_CONTRACT, AllowlisterFactory.abi, signerOrProvider);
       const raffleId = BigNumber.from(await contract.s_raffleId());
       const result = await contract.createRaffle(
         handle, event.target.raffle_name.value, event.target.number_of_spots.value, ethers.constants.AddressZero, ethers.constants.AddressZero

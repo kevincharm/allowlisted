@@ -147,10 +147,12 @@ contract Allowlister is IRandomiserCallback, Ownable {
         // Ensure user registering for raffle passes validation
         // This is where the validation module would check for this profile's
         // follower count, publication count, or timestamp of follow.
-        require(
-            validateModule.validate(profileId),
-            "Profile validation failed"
-        );
+        if (address(validateModule) != address(0)) {
+            require(
+                validateModule.validate(profileId),
+                "Profile validation failed"
+            );
+        }
         s_registeredIds.push(profileId);
         s_registeredAddresses[profileId] = msg.sender;
     }

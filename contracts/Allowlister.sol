@@ -98,9 +98,6 @@ contract Allowlister is IRandomiserCallback, Ownable {
 
         bool hasWinnersModule = address(winnersModule) != address(0);
 
-        // Initialise random seed
-        requestRandomNumber();
-
         for (uint256 i = 0; i < winnersToDraw; i++) {
             uint256 randomIndex = getNextRandomNumber() % (winnersToDraw - i);
             uint256 drawnProfileId = s_registeredIds[randomIndex];
@@ -177,7 +174,7 @@ contract Allowlister is IRandomiserCallback, Ownable {
     /**
      * @notice Request a random number from the Randomiser contract.
      */
-    function requestRandomNumber() private {
+    function requestRandomNumber() external onlyOwner {
         require(s_randomState == 0, "Randomness has already been set");
         randomiser.getRandomNumber(address(this));
     }

@@ -15,6 +15,8 @@ export default function Example() {
   const [isOpen, setIsOpen] = useState(false);
   const [isCreating, setCreating] = useState(false);
   const [isRegistered, setRegistered] = useState(false);
+  const [isRaffleDone, setRaffleDone] = useState(false);
+  const [winner, setWinner] = useState(false);
   const [raffleName, setRaffleName] = useState("Loading...");
   const [winnersToDraw, setWinnersToDraw] = useState(0);
   const onClose = () => setIsOpen(false)
@@ -27,6 +29,19 @@ export default function Example() {
     contract.displayName().then((x) => setRaffleName(x));
     contract.winnersToDraw().then((x) => setWinnersToDraw(x.toNumber()));
     contract.s_addressRegistered(account).then((x) => setRegistered(x));
+    contract.s_isRaffleFinished().then((x) => setRaffleDone(x));
+
+    contract.getWinnersLength().then((l) => {
+      for (let i = 0; i < l; i++) {
+        contract.s_winners(i).then((address) => {
+          const winner = account === address
+          if (winner) {
+            setWinner(true);
+          }
+        })
+      }
+    });
+
   }, [router.query.address, signerOrProvider])
 
   const handleSubmit = useCallback(async (event) => {
@@ -70,6 +85,15 @@ export default function Example() {
                 <div className="mt-5 md:mt-0 md:col-span-2">
                   <form onSubmit={handleSubmit}>
                     <div className="shadow overflow-hidden sm:rounded-md">
+
+                      {isRaffleDone &&
+                        <div className="mt-5 md:mt-0 md:col-span-2">
+                          Raffle is done! {winner ? "You won!" : "You didn't win."}
+                        </div>
+                      }
+
+
+                      {!isRaffleDone &&
                       <div className="px-4 py-5 bg-white sm:p-6">
                         <div className="mt-5 md:mt-0 md:col-span-2">
                           <legend className="text-base font-bold text-gray-900">Profile requirements</legend>
@@ -118,8 +142,8 @@ export default function Example() {
                           </span>
                         </div>
                         }
-
                       </div>
+                      }
                     </div>
                   </form>
                 </div>

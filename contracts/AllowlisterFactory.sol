@@ -43,7 +43,10 @@ contract AllowlisterFactory is Ownable {
             winnersModule,
             validateModule
         );
+        // Transfer ownership of raffle to account that created raffle
+        raffle.transferOwnership(msg.sender);
         raffles[raffleId] = raffle;
+        // Authorise newly-deployed raffle contract on the randomiser
         randomiser.authorise(address(raffle));
         return (address(raffle), raffleId);
     }

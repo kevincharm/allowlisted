@@ -85,7 +85,7 @@ contract Allowlister is IRandomiserCallback, Ownable {
     /**
      * @notice Executes the raffle, picking random winners from the `ids` array.
      */
-    function raffle() public {
+    function raffle() external onlyOwner {
         require(!s_isRaffleFinished, "Raffle already finished");
         DataTypes.ProfileStruct memory profile = lensHub.getProfile(
             raffleProfileId
@@ -103,6 +103,9 @@ contract Allowlister is IRandomiserCallback, Ownable {
         uint256[] memory registeredIds = s_registeredIds;
 
         bool hasWinnersModule = address(winnersModule) != address(0);
+
+        // Initialise random seed
+        requestRandomNumber();
 
         for (uint256 i = 0; i < winnersToDraw; i++) {
             uint256 randomIndex = getNextRandomNumber() % (winnersToDraw - i);
@@ -180,7 +183,7 @@ contract Allowlister is IRandomiserCallback, Ownable {
     /**
      * @notice Request a random number from the Randomiser contract.
      */
-    function getRandomNumber() external onlyOwner {
+    function requestRandomNumber() private {
         require(s_randomState == 0, "Randomness has already been set");
         randomiser.getRandomNumber(address(this));
     }

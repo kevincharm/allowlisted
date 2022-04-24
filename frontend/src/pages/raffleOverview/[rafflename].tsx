@@ -18,6 +18,8 @@ export default function Example() {
   const signerOrProvider = useSignerOrProvider();
   const [raffleName, setRaffleName] = useState("Loading...");
   const [winnersToDraw, setWinnersToDraw] = useState(0);
+  const [raffleReady, setRaffleReady] = useState(false);
+
   const image = 'https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80';
   const [registeredUsers, setRegisteredUsers] = useState([
     {
@@ -45,6 +47,7 @@ export default function Example() {
     const contract = new ethers.Contract(address as string, Allowlister.abi, signerOrProvider);
     contract.displayName().then((x) => setRaffleName(x));
     contract.winnersToDraw().then((x) => setWinnersToDraw(x.toNumber()));
+    contract.s_randomState().then((x) => setRaffleReady(!x.eq(0)));
     const lensHub = new ethers.Contract(	"0x4BF0c7AD32Fd2d32089790a54485e23f5C7736C0", LensHub.abi, signerOrProvider);
     console.log(contract);
     let users = [];
@@ -62,24 +65,46 @@ export default function Example() {
     });
   }, [router.query.rafflename, signerOrProvider])
 
-  const handleSubmit = useCallback(async (event) => {
+  const handleRandomState = useCallback(async (event) => {
     console.log(`Handling!`);
     event.preventDefault();
-    const address = router.query.address
+    const address = router.query.rafflename
     if (!address || !signerOrProvider) {
       return
     }
     setCreating(true);
     try {
       const contract = new ethers.Contract(address as string, Allowlister.abi, signerOrProvider);
-      await contract.connect(signerOrProvider).raffle();
+      console.log(contract);
+      await contract.requestRandomNumber();
       setIsOpen(true);
     } catch (e) {
       console.log(e);
     } finally {
       setCreating(false);
     }
-  }, [router.query.address, signerOrProvider]);
+  }, [router.query.rafflename, signerOrProvider]);
+
+  const handleSubmit = useCallback(async (event) => {
+    console.log(`Handling!`);
+    event.preventDefault();
+    const address = router.query.rafflename
+    if (!address || !signerOrProvider) {
+      return
+    }
+    setCreating(true);
+    try {
+      const contract = new ethers.Contract(address as string, Allowlister.abi, signerOrProvider);
+      console.log(contract);
+      await contract.raffle();
+      setIsOpen(true);
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setCreating(false);
+    }
+  }, [router.query.rafflename, signerOrProvider]);
+
 
   return (
     <div>
@@ -227,8 +252,33 @@ export default function Example() {
                             </div>
                           </div>
                         </div>
+
+
+
                         <div className="px-4 py-3 bg-gray-50 text-center sm:px-6">
-                          {!isCreating &&
+                          {!raffleReady &&
+
+                          <button
+                            type="submit"
+                            className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-lime-400 bg-opacity-20 text-lime-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                          >
+                            Roll dice!
+                          </button>
+                          }
+                          {(!raffleReady && isCreating) &&
+
+
+                          <button type="button" disabled className="bg-indigo-500 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+
+                            <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                                 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Rolling...
+                          </button>
+                          }
+                          {(raffleReady && !isCreating) &&
 
                           <button
                             type="submit"
@@ -237,7 +287,7 @@ export default function Example() {
                             Start raffle
                           </button>
                           }
-                          {isCreating &&
+                          {(raffleReady && isCreating) &&
 
 
                           <button type="button" disabled className="bg-indigo-500 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
